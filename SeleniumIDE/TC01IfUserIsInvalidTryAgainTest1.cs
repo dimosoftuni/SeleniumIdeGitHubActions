@@ -15,13 +15,16 @@ using NUnit.Framework;
 public class TC01IfUserIsInvalidTryAgainTest
 {
     private IWebDriver driver;
+    private ChromeOptions options;
     public IDictionary<string, object> vars { get; private set; }
     private IJavaScriptExecutor js;
 
     [SetUp]
     public void SetUp()
     {
-        driver = new ChromeDriver();
+        options = new ChromeOptions();
+        options.AddArgument("--headless");
+        driver = new ChromeDriver(options);
         js = (IJavaScriptExecutor)driver;
         vars = new Dictionary<string, object>();
     }
@@ -30,6 +33,7 @@ public class TC01IfUserIsInvalidTryAgainTest
     protected void TearDown()
     {
         driver.Quit();
+        driver.Dispose();
     }
 
     [Test]
@@ -58,7 +62,7 @@ public class TC01IfUserIsInvalidTryAgainTest
         // 10 | storeText | css=*[data-test="error"] | errorMessage
         vars["errorMessage"] = driver.FindElement(By.CssSelector("*[data-test=\"error\"]")).Text;
         // 11 | if |  ${errorMessage} === "Epic sadface: Username and password do not match any user in this service" | 
-        if ((Boolean)js.ExecuteScript("return (arguments[0] === \'Epic sadface: Username and password do not match any user in this service\')", vars["errorMessage"]))
+        if ((bool)js.ExecuteScript("return (arguments[0] === \'Epic sadface: Username and password do not match any user in this service\')", vars["errorMessage"]))
         {
             // 12 | echo | Wrong username | 
             Console.WriteLine("Wrong username");
